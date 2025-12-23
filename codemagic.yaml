@@ -1,0 +1,49 @@
+workflows:
+  ios-workflow:
+    name: LED Glow iOS Build (Manual IPA - Guaranteed)
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+    environment:
+      xcode: latest
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+    scripts:
+      - name: Install Dependencies
+        script: |
+          brew install xcodegen
+      - name: Generate Xcode Project
+        script: |
+          xcodegen generate
+      - name: Verify Scheme
+        script: |
+          xcodebuild -list -project LEDControl.xcodeproj
+      - name: Build Archive (Unsigned)
+        script: |
+          xcodebuild archive \
+            -project LEDControl.xcodeproj \
+            -scheme LEDControl \
+            -configuration Release \
+            -archivePath build/LEDControl.xcarchive \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_ENTITLEMENTS=NO \
+            CODE_SIGN_IDENTITY=""
+      - name: Create IPA Manually
+        script: |
+          # Создаём правильную структуру Payload
+          mkdir -p build/Payload
+          cp -R build/LEDControl.xcarchive/Products/Applications/LEDControl.app build/Payload/
+          
+          # Создаём IPA
+          cd build
+          zip -qr LEDControl.ipa Payload
+          
+          # Перемещаем в artifacts
+          mkdir -p ios/ipa
+          mv LEDControl.ipa ios/ipa/
+    artifacts:
+      - "build/ios/ipa/*.ipa"
+      - "build/LEDControl.xcarchive"

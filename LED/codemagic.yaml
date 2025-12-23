@@ -1,0 +1,35 @@
+workflows:
+  ios-workflow:
+    name: LED Glow iOS Build
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+    environment:
+      xcode: latest
+      ios_signing:
+        distribution_type: ad_hoc # Change to app_store for release
+        bundle_identifier: com.buda1337.LEDControl
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+    scripts:
+      - name: Install XcodeGen and generate project
+        script: |
+          brew install xcodegen
+          xcodegen generate
+      - name: Set up code signing
+        script: |
+          keychain initialize
+          # This assumes Codemagic App Store Connect integration is set up
+          app-store-connect fetch-signing-files "com.buda1337.LEDControl" --type IOS_APP_ADHOC --create
+          keychain add-certificates
+      - name: Build IPA
+        script: |
+          xcode-project build-ipa \
+            --project LEDControl.xcodeproj \
+            --scheme LEDControl \
+            --configuration Release
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - *.xcarchive

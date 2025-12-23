@@ -1,0 +1,29 @@
+name: LEDControl
+options:
+  bundleIdPrefix: com.buda1337
+targets:
+  LEDControl:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - Sources
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.buda1337.LEDControl
+      INFOPLIST_FILE: Info.plist
+      CODE_SIGN_STYLE: Automatic
+      CODE_SIGN_IDENTITY: Apple Development
+      DEVELOPMENT_TEAM: ""
+    info:
+      path: Info.plist
+      properties:
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UILaunchScreen: {}
+        UIBackgroundModes: [bluetooth-central, audio, remote-notification, fetch, processing]
+        NSBluetoothAlwaysUsageDescription: "Access is required to control your LED hardware via BLE."
+        NSMicrophoneUsageDescription: "Microphone access enables real-time light sync with surrounding sound."
+        NSCameraUsageDescription: "Camera access is needed to scan your controller's setup QR code."
+        NSAppleMusicUsageDescription: "Access your library to sync lights with your favorite tracks."
+        CFBundleDisplayName: "LED Glow"
+        CFBundleName: "LEDControl"
+
